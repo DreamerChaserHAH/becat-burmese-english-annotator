@@ -1,0 +1,184 @@
+openapi: 3.0.3
+info:
+  title: BeCat Crowdsourced Translation Annotation Platform
+  description: |-
+    Burmese is inherently a low resource language with very little high quality available for Machine Learning Experts to use to train their ML models on. We want to change that by allowing average Myanmar people to contribute to the data generation process so that a better future can be built
+    
+    This is the public facing API that would be consumed by the frontend interfaces.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/api
+  - url: http://becat.datamyanmar.org/api
+paths:
+  /login:
+    post:
+      summary: Login
+      description: Authenticates the user with user-id and password.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                password:
+                  type: string
+              required:
+                - user_id
+                - password
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /logout:
+    post:
+      summary: Logout
+      description: Logs out the user, invalidating the session token.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful logout
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /get-language-pair:
+    get:
+      summary: Get a random language pair
+      description: Fetch a random language pair that is decided to be needed to annotate by the system
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: A list of language pairs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  language_pairs:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        burmese:
+                          type: string
+                        english:
+                          type: string
+
+  /annotate:
+    post:
+      summary: Annotate
+      description: Annotates a particular language pair with "OK" or "NOT OK" and additional feedback.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                language_pair_id:
+                  type: string
+                annotation:
+                  type: string
+                  enum: [OK, NOT OK]
+                feedback:
+                  type: string
+              required:
+                - language_pair_id
+                - annotation
+      responses:
+        '201':
+          description: Annotation submitted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /history:
+    get:
+      summary: Get Annotation History
+      description: Fetches the annotation history of the logged-in user.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: A list of annotations made by the user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  history:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        language_pair_id:
+                          type: string
+                        annotation:
+                          type: string
+                        feedback:
+                          type: string
+                        timestamp:
+                          type: string
+
+  /global-stats:
+    get:
+      summary: Get Global Statistics
+      description: Displays global statistics like total annotations, total users, etc.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Global statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_users:
+                    type: integer
+                  total_annotations:
+                    type: integer
+                  total_annotated_data:
+                    type: integer
+                  total_unannotated_data:
+                    type: integer
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
