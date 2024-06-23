@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
+    kotlin("plugin.serialization") version "2.0.0"
 }
 
 kotlin {
@@ -55,6 +56,10 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation("io.ktor:ktor-client-core:1.6.7")
+            implementation("io.ktor:ktor-client-cio:1.6.7")
+            implementation("io.ktor:ktor-client-json:1.6.7")
+            implementation("io.ktor:ktor-client-serialization:1.6.7")
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -63,10 +68,16 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
+            implementation("io.ktor:ktor-client-core:1.6.7")
+            implementation("io.ktor:ktor-client-cio:1.6.7")
+            implementation("io.ktor:ktor-client-json:1.6.7")
+            implementation("io.ktor:ktor-client-serialization:1.6.7")
         }
+
     }
 }
 
