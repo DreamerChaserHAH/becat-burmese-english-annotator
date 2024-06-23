@@ -10,5 +10,5 @@ actual inline fun <reified T>sendPostRequest(url: String, postData: T) {
 }
 
 fun postRequest(url: String, postData: String) {
-    js("fetch(url, {method: 'POST', body: postData, headers: {'Content-Type': 'application/json'}}).then(response => response.json()).then(data => console.log(data))")
+    js("console.log(postData);fetch(url, {method: 'POST', body: postData, headers: {'Content-Type': 'application/json'}}).then(response => response.json()).then(data => console.log(data))")
 }
