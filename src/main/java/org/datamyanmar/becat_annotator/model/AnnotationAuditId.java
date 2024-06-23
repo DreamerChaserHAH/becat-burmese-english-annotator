@@ -2,34 +2,25 @@ package org.datamyanmar.becat_annotator.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.Hibernate;
 
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
+@Getter
+@Setter
 @Embeddable
 public class AnnotationAuditId implements java.io.Serializable {
     private static final long serialVersionUID = -5471505093231515425L;
+    @NotNull
     @Column(name = "\"UserID\"", nullable = false)
     private Integer userID;
 
+    @NotNull
     @Column(name = "\"TextID\"", nullable = false)
     private Integer textID;
-
-    public Integer getUserID() {
-        return userID;
-    }
-
-    public void setUserID(Integer userID) {
-        this.userID = userID;
-    }
-
-    public Integer getTextID() {
-        return textID;
-    }
-
-    public void setTextID(Integer textID) {
-        this.textID = textID;
-    }
 
     @Override
     public boolean equals(Object o) {

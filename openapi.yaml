@@ -6,12 +6,23 @@ info:
     
     This is the public facing API that would be consumed by the frontend interfaces.
   version: 1.0.0
+  contact:
+    email: contact@datamyanmar.org
 servers:
   - url: http://localhost:8080/api
   - url: http://becat.datamyanmar.org/api
+tags:
+  - name: user
+    description: individual related stuff
+  - name: language-pair
+    description: getting and setting language pairs
+  - name: global
+    description: publicly available data
 paths:
-  /login:
+  /user/login:
     post:
+      tags:
+        - user
       summary: Login
       description: Authenticates the user with user-id and password.
       requestBody:
@@ -48,9 +59,11 @@ paths:
                   message:
                     type: string
 
-  /logout:
+  /user/logout:
     post:
       summary: Logout
+      tags:
+        - user
       description: Logs out the user, invalidating the session token.
       security:
         - bearerAuth: []
@@ -64,10 +77,41 @@ paths:
                 properties:
                   message:
                     type: string
+  /user/history:
+    get:
+      summary: Get Annotation History
+      description: Fetches the annotation history of the logged-in user.
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: A list of annotations made by the user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  history:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        language_pair_id:
+                          type: string
+                        annotation:
+                          type: string
+                        feedback:
+                          type: string
+                        timestamp:
+                          type: string
 
-  /get-language-pair:
+  /language-pair/get:
     get:
       summary: Get a random language pair
+      tags:
+        - language-pair
       description: Fetch a random language pair that is decided to be needed to annotate by the system
       security:
         - bearerAuth: []
@@ -91,9 +135,11 @@ paths:
                         english:
                           type: string
 
-  /annotate:
+  /language-pair/annotate:
     post:
       summary: Annotate
+      tags:
+        - language-pair
       description: Annotates a particular language pair with "OK" or "NOT OK" and additional feedback.
       security:
         - bearerAuth: []
@@ -125,40 +171,14 @@ paths:
                   message:
                     type: string
 
-  /history:
-    get:
-      summary: Get Annotation History
-      description: Fetches the annotation history of the logged-in user.
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: A list of annotations made by the user
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  history:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        language_pair_id:
-                          type: string
-                        annotation:
-                          type: string
-                        feedback:
-                          type: string
-                        timestamp:
-                          type: string
-
   /global-stats:
     get:
       summary: Get Global Statistics
       description: Displays global statistics like total annotations, total users, etc.
       security:
         - bearerAuth: []
+      tags:
+        - global
       responses:
         '200':
           description: Global statistics
@@ -169,7 +189,7 @@ paths:
                 properties:
                   total_users:
                     type: integer
-                  total_annotations:
+                  total_text:
                     type: integer
                   total_annotated_data:
                     type: integer

@@ -1,70 +1,41 @@
 package org.datamyanmar.becat_annotator.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
+import javax.validation.constraints.NotNull;
+
+@Getter
+@Setter
 @Entity
 @Table(name = "\"Text\"")
 public class Text {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Text_id_gen")
-    @SequenceGenerator(name = "Text_id_gen", sequenceName = "Text_TextID_seq", allocationSize = 1)
     @Column(name = "\"TextID\"", nullable = false)
     private Integer id;
 
+    @NotNull
     @ColumnDefault("0")
     @Column(name = "\"AnnotatedVotes\"", nullable = false)
     private Integer annotatedVotes;
+    @NotNull
     @ColumnDefault("0")
     @Column(name = "\"NotOk\"", nullable = false)
     private Integer notOk;
 
+    @NotNull
     @ColumnDefault("0")
     @Column(name = "\"Ok\"", nullable = false)
     private Integer ok;
+    @NotNull
     @ColumnDefault("0")
     @Column(name = "\"Maybe\"", nullable = false)
     private Integer maybe;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getAnnotatedVotes() {
-        return annotatedVotes;
-    }
-
-    public void setAnnotatedVotes(Integer annotatedVotes) {
-        this.annotatedVotes = annotatedVotes;
-    }
-
-    public Integer getOk() {
-        return ok;
-    }
-
-    public void setOk(Integer ok) {
-        this.ok = ok;
-    }
-
-    public Integer getNotOk() {
-        return notOk;
-    }
-
-    public void setNotOk(Integer notOk) {
-        this.notOk = notOk;
-    }
-
-    public Integer getMaybe() {
-        return maybe;
-    }
-
-    public void setMaybe(Integer maybe) {
-        this.maybe = maybe;
-    }
 
 /*
  TODO [Reverse Engineering] create field to map the '\"English\"' column

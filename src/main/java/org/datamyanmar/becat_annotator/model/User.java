@@ -1,79 +1,43 @@
 package org.datamyanmar.becat_annotator.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
+import javax.validation.constraints.NotNull;
+
+@Getter
+@Setter
 @Entity
 @Table(name = "\"User\"")
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "User_id_gen")
-    @SequenceGenerator(name = "User_id_gen", sequenceName = "User_UserID_seq", allocationSize = 1)
     @Column(name = "\"UserID\"", nullable = false)
     private Integer id;
 
+    @NotNull
     @Column(name = "\"LoginID\"", nullable = false, length = Integer.MAX_VALUE)
     private String loginID;
 
+    @NotNull
     @Column(name = "\"Salt\"", nullable = false, length = Integer.MAX_VALUE)
     private String salt;
 
+    @NotNull
     @Column(name = "\"Hash\"", nullable = false, length = Integer.MAX_VALUE)
     private String hash;
 
+    @NotNull
     @Column(name = "\"DisplayName\"", nullable = false, length = Integer.MAX_VALUE)
     private String displayName;
 
+    @NotNull
     @ColumnDefault("0")
     @Column(name = "\"TotalAnnotated\"", nullable = false)
     private Integer totalAnnotated;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getLoginID() {
-        return loginID;
-    }
-
-    public void setLoginID(String loginID) {
-        this.loginID = loginID;
-    }
-
-    public String getSalt() {
-        return salt;
-    }
-
-    public void setSalt(String salt) {
-        this.salt = salt;
-    }
-
-    public String getHash() {
-        return hash;
-    }
-
-    public void setHash(String hash) {
-        this.hash = hash;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
-    }
-
-    public Integer getTotalAnnotated() {
-        return totalAnnotated;
-    }
-
-    public void setTotalAnnotated(Integer totalAnnotated) {
-        this.totalAnnotated = totalAnnotated;
-    }
 
 }
