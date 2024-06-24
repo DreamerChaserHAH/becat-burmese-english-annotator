@@ -1,28 +1,20 @@
 package org.datamyanmar.becat_annotator.service;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.datamyanmar.becat_annotator.api.UserApiDelegate;
 import org.datamyanmar.becat_annotator.model.*;
 import org.datamyanmar.becat_annotator.repository.UserRepository;
+import org.datamyanmar.becat_annotator.repository.AnnotationAuditRepository;
+import org.datamyanmar.becat_annotator.utils.JwtTokenUtility;
+import org.datamyanmar.becat_annotator.utils.WebRequestUtility;
+import org.datamyanmar.becat_annotator.utils.WebResponseUtility;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCrypt;
-import org.springframework.security.oauth2.server.resource.web.DefaultBearerTokenResolver;
 import org.springframework.stereotype.Service;
-
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-import java.util.Calendar;
-import java.util.Date;
-
-import java.security.Key;
 
 import java.util.Optional;
 
@@ -31,56 +23,48 @@ public class UserApiImpl implements UserApiDelegate {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private AnnotationAuditRepository annotationAuditRepository;
 
     @Autowired
     private HttpServletRequest request;
     @Autowired
     private HttpServletResponse response;
 
-    @Override
-    public ResponseEntity<UserLoginPost200Response> userLoginPost(UserLoginPostRequest userLoginPostRequest) {
-        Cookie[] cookies = request.getCookies();
+    private void setLoginToken(User user){
+        String jwtToken = JwtTokenUtility.createJwtToken(user.getId().getUserid());
+        WebResponseUtility.addCookie(response, "token", jwtToken);
+    }
 
-        if(cookies != null){
-            if(cookies.length > 0){
-                for(Cookie cookie: cookies){
-                    if(cookie.getName().equals("token")){
-                        //try login
-                        //if token is valid, return 200
-                        //if token is invalid, return 401 and asks to login again
-                    }
-                }
+    @Override
+    public ResponseEntity<LoginUser200Response> loginUser(LoginUserRequest userLoginPostRequest) {
+
+        //check if there's an existing token
+        //if yes, try login with that token
+        //  check if the token is valid and the user exists
+        //      if yes, login and update the expiration date of the token
+        //      if no, return unauthorized
+        //if no, skip this step
+        String token = WebRequestUtility.getToken(request);
+        if(token != null && !token.isEmpty()) {
+            Optional<User> user = WebRequestUtility.validateUserFromToken(userRepository, response, token);
+            if (user.isPresent()) {
+                setLoginToken(user.get());
+                return new ResponseEntity<>(new LoginUser200Response().message("Login Successful"), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
         }
 
-        String loginId = userLoginPostRequest.getUserId();
+        String loginId = userLoginPostRequest.getLoginid();
         String password = userLoginPostRequest.getPassword();
         Optional<User> userOptional = userRepository.findByLoginID(loginId);
         if(userOptional.isPresent()){
             User user = userOptional.get();
             if(user.getHash().equals(BCrypt.hashpw(password, user.getSalt()))){
                 //Create JWT Token to be stored on the client device for authorization
-
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(new Date());
-                calendar.add(Calendar.HOUR, 1);
-
-                String jwtToken = Jwts.builder()
-                        .subject(user.getId().toString())
-                        .issuedAt(new Date())
-                        .expiration(calendar.getTime())
-                        //.setExpiration(calendar.getTime())
-                        //.signWith(SignatureAlgorithm.HS256, "secretkey")
-                        .compact();
-
-                //ServletRequestAttributes attr = (ServletRequestAttributes) org.springframework.web.context.request.RequestContextHolder.currentRequestAttributes();
-
-                    Cookie cookie = new Cookie("token", jwtToken);
-                    cookie.setHttpOnly(true);
-                    cookie.setPath("/");
-                    response.addCookie(cookie);
-                    System.out.println(response.containsHeader("Set-Cookie"));
-                return new ResponseEntity<>(new UserLoginPost200Response().token(jwtToken), HttpStatus.OK);
+                setLoginToken(user);
+                return new ResponseEntity<>(new LoginUser200Response().message("Login Successful"), HttpStatus.OK);
             }else{
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
             }
@@ -89,13 +73,44 @@ public class UserApiImpl implements UserApiDelegate {
         }
     }
 
-    @Override
-    public ResponseEntity<UserLoginPost401Response> userLogoutPost() {
-        return UserApiDelegate.super.userLogoutPost();
-    }
 
     @Override
-    public ResponseEntity<UserHistoryGet200Response> userHistoryGet() {
-        return UserApiDelegate.super.userHistoryGet();
+    public ResponseEntity<LoginUser200Response> logoutUser() {
+        WebResponseUtility.addCookie(response, "token", "");
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    ///<summary>
+    ///get the list of activities that the user have done
+    ///</summary>
+    @Override
+    public ResponseEntity<GetUserHistory200Response> getUserHistory() {
+
+        Integer userId = 0;
+        String token = WebRequestUtility.getToken(request);
+        if(token != null && !token.isEmpty()) {
+            Optional<User> user = WebRequestUtility.validateUserFromToken(userRepository, response, token);
+            if (user.isPresent()) {
+                userId = user.get().getId().getUserid();
+            } else {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+        }
+
+        GetUserHistory200Response response = new GetUserHistory200Response();
+        PageRequest pageRequest = PageRequest.of(0, 5);
+
+        response.totalAnnotations(annotationAuditRepository.countByIdUserid(userId));
+        response.annotatedToday(annotationAuditRepository.countByIdUseridAnnotatedToday(userId));
+
+        for(AnnotationAudit record: annotationAuditRepository.findByIdUserid(userId, pageRequest)){
+            response.addHistoryItem(new GetUserHistory200ResponseHistoryInner()
+                    .languagePairId(record.getId().getTextid())
+                    .annotation(AnnotationType.fromValue(record.getAnnotation()))
+                    .feedback(record.getFeedback())
+                    .timestamp(record.getTimestamp().toString())
+            );
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

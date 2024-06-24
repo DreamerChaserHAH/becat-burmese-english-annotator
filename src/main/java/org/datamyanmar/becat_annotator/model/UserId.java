@@ -11,28 +11,28 @@ import java.util.Objects;
 @Getter
 @Setter
 @Embeddable
-public class AnnotationAuditId implements java.io.Serializable {
-    private static final long serialVersionUID = 5026538298914995272L;
-    @javax.validation.constraints.NotNull
-    @Column(name = "textid", nullable = false)
-    private Integer textid;
-
+public class UserId implements java.io.Serializable {
+    private static final long serialVersionUID = 124394144990489704L;
     @javax.validation.constraints.NotNull
     @Column(name = "userid", nullable = false)
     private Integer userid;
+
+    @javax.validation.constraints.NotNull
+    @Column(name = "loginid", nullable = false, length = Integer.MAX_VALUE)
+    private String loginid;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        AnnotationAuditId entity = (AnnotationAuditId) o;
-        return Objects.equals(this.textid, entity.textid) &&
+        UserId entity = (UserId) o;
+        return Objects.equals(this.loginid, entity.loginid) &&
                 Objects.equals(this.userid, entity.userid);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(textid, userid);
+        return Objects.hash(loginid, userid);
     }
 
 }

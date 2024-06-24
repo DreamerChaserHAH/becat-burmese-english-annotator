@@ -1,43 +1,30 @@
 package org.datamyanmar.becat_annotator.model;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
-
-import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "\"User\"")
+@Table(name = "\"user\"")
 public class User {
-    @Id
-    @Column(name = "\"UserID\"", nullable = false)
-    private Integer id;
+    @EmbeddedId
+    private UserId id;
 
-    @NotNull
-    @Column(name = "\"LoginID\"", nullable = false, length = Integer.MAX_VALUE)
-    private String loginID;
-
-    @NotNull
-    @Column(name = "\"Salt\"", nullable = false, length = Integer.MAX_VALUE)
-    private String salt;
-
-    @NotNull
-    @Column(name = "\"Hash\"", nullable = false, length = Integer.MAX_VALUE)
-    private String hash;
-
-    @NotNull
-    @Column(name = "\"DisplayName\"", nullable = false, length = Integer.MAX_VALUE)
+    @Column(name = "display_name", length = Integer.MAX_VALUE)
     private String displayName;
 
-    @NotNull
-    @ColumnDefault("0")
-    @Column(name = "\"TotalAnnotated\"", nullable = false)
+    @Column(name = "hash", length = Integer.MAX_VALUE)
+    private String hash;
+
+    @Column(name = "salt", length = Integer.MAX_VALUE)
+    private String salt;
+
+    @Column(name = "total_annotated")
     private Integer totalAnnotated;
 
 }

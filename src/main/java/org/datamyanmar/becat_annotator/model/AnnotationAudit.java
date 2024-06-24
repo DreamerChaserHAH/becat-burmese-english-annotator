@@ -6,22 +6,28 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 
-import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "\"Annotation Audit\"")
+@Table(name = "\"annotation audit\"")
 public class AnnotationAudit {
     @EmbeddedId
     private AnnotationAuditId id;
 
-    @NotNull
-    @Column(name = "\"Annotation\"", nullable = false)
-    private Short annotation;
-
-    @Column(name = "\"Feedback\"", length = Integer.MAX_VALUE)
+    @Column(name = "feedback", length = Integer.MAX_VALUE)
     private String feedback;
+
+    @javax.validation.constraints.NotNull
+    @ColumnDefault("now()")
+    @Column(name = "\"timestamp\"", nullable = false)
+    private LocalDate timestamp;
+
+    @javax.validation.constraints.NotNull
+    @Column(name = "annotation", nullable = false, length = Integer.MAX_VALUE)
+    private String annotation;
 
 }

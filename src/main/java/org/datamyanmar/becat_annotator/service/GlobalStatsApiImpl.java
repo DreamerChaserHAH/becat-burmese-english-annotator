@@ -1,7 +1,7 @@
 package org.datamyanmar.becat_annotator.service;
 
 import org.datamyanmar.becat_annotator.api.GlobalStatsApiDelegate;
-import org.datamyanmar.becat_annotator.model.GlobalStatsGet200Response;
+import org.datamyanmar.becat_annotator.model.GetGlobalStats200Response;
 import org.datamyanmar.becat_annotator.repository.AnnotationAuditRepository;
 import org.datamyanmar.becat_annotator.repository.TextRepository;
 import org.datamyanmar.becat_annotator.repository.UserRepository;
@@ -19,12 +19,12 @@ class GlobalStatsApiImpl implements GlobalStatsApiDelegate {
     private AnnotationAuditRepository annotationAuditRepository;
 
     @Override
-    public ResponseEntity<GlobalStatsGet200Response> globalStatsGet() {
+    public ResponseEntity<GetGlobalStats200Response> getGlobalStats() {
         int annotatedDataCount = (int) annotationAuditRepository.count();
         int totalTextCount = (int) textRepository.count();
         int unansweredTextCount = totalTextCount - annotatedDataCount;
         return ResponseEntity.ok(
-                new GlobalStatsGet200Response()
+                new GetGlobalStats200Response()
                         .totalUsers((int) userRepository.count())
                         .totalAnnotatedData(annotatedDataCount)
                         .totalUnannotatedData(unansweredTextCount)

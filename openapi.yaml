@@ -21,6 +21,7 @@ tags:
 paths:
   /user/login:
     post:
+      operationId: loginUser
       tags:
         - user
       summary: Login
@@ -32,12 +33,12 @@ paths:
             schema:
               type: object
               properties:
-                user_id:
+                loginid:
                   type: string
                 password:
                   type: string
               required:
-                - user_id
+                - loginid
                 - password
       responses:
         '200':
@@ -47,7 +48,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  token:
+                  message:
                     type: string
         '401':
           description: Invalid credentials
@@ -61,6 +62,7 @@ paths:
 
   /user/logout:
     post:
+      operationId: logoutUser
       summary: Logout
       tags:
         - user
@@ -79,6 +81,7 @@ paths:
                     type: string
   /user/history:
     get:
+      operationId: getUserHistory
       summary: Get Annotation History
       description: Fetches the annotation history of the logged-in user.
       tags:
@@ -93,22 +96,27 @@ paths:
               schema:
                 type: object
                 properties:
+                  total_annotations:
+                    type: integer
+                  annotated_today:
+                    type: integer
                   history:
-                    type: array
+                    type: object
                     items:
                       type: object
                       properties:
                         language_pair_id:
-                          type: string
+                          type: integer
                         annotation:
-                          type: string
+                          $ref: '#/components/schemas/AnnotationType'
                         feedback:
                           type: string
                         timestamp:
                           type: string
 
-  /language-pair/get:
+  /language-pair/retrieve:
     get:
+      operationId: getLanguagePair
       summary: Get a random language pair
       tags:
         - language-pair
@@ -123,20 +131,16 @@ paths:
               schema:
                 type: object
                 properties:
-                  language_pairs:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                        burmese:
-                          type: string
-                        english:
-                          type: string
+                  id:
+                    type: integer
+                  burmese:
+                    type: string
+                  english:
+                    type: string
 
   /language-pair/annotate:
-    post:
+    put:
+      operationId: annotateLanguagePair
       summary: Annotate
       tags:
         - language-pair
@@ -153,8 +157,7 @@ paths:
                 language_pair_id:
                   type: string
                 annotation:
-                  type: string
-                  enum: [OK, NOT OK]
+                  $ref: '#/components/schemas/AnnotationType'
                 feedback:
                   type: string
               required:
@@ -173,6 +176,7 @@ paths:
 
   /global-stats:
     get:
+      operationId: getGlobalStats
       summary: Get Global Statistics
       description: Displays global statistics like total annotations, total users, etc.
       security:
@@ -197,6 +201,10 @@ paths:
                     type: integer
 
 components:
+  schemas:
+    AnnotationType:
+      type: string
+      enum: [UNMARKED, OKAY, MAYBE, REJECTED]
   securitySchemes:
     bearerAuth:
       type: http
