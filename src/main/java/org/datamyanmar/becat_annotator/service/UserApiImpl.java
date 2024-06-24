@@ -32,12 +32,12 @@ public class UserApiImpl implements UserApiDelegate {
     private HttpServletResponse response;
 
     private void setLoginToken(User user){
-        String jwtToken = JwtTokenUtility.createJwtToken(user.getId().getUserid());
+        String jwtToken = JwtTokenUtility.createJwtToken(user.getId());
         WebResponseUtility.addCookie(response, "token", jwtToken);
     }
 
     @Override
-    public ResponseEntity<LoginUser200Response> loginUser(LoginUserRequest userLoginPostRequest) {
+    public ResponseEntity<String> loginUser(LoginUserRequest userLoginPostRequest) {
 
         //check if there's an existing token
         //if yes, try login with that token
@@ -50,7 +50,7 @@ public class UserApiImpl implements UserApiDelegate {
             Optional<User> user = WebRequestUtility.validateUserFromToken(userRepository, response, token);
             if (user.isPresent()) {
                 setLoginToken(user.get());
-                return new ResponseEntity<>(new LoginUser200Response().message("Login Successful"), HttpStatus.OK);
+                return new ResponseEntity<>("Login Successful", HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
@@ -64,7 +64,7 @@ public class UserApiImpl implements UserApiDelegate {
             if(user.getHash().equals(BCrypt.hashpw(password, user.getSalt()))){
                 //Create JWT Token to be stored on the client device for authorization
                 setLoginToken(user);
-                return new ResponseEntity<>(new LoginUser200Response().message("Login Successful"), HttpStatus.OK);
+                return new ResponseEntity<>("Login Successful", HttpStatus.OK);
             }else{
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
             }
@@ -75,9 +75,9 @@ public class UserApiImpl implements UserApiDelegate {
 
 
     @Override
-    public ResponseEntity<LoginUser200Response> logoutUser() {
+    public ResponseEntity<String> logoutUser() {
         WebResponseUtility.addCookie(response, "token", "");
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>("Logout Successfully", HttpStatus.OK);
     }
 
     ///<summary>
@@ -91,7 +91,7 @@ public class UserApiImpl implements UserApiDelegate {
         if(token != null && !token.isEmpty()) {
             Optional<User> user = WebRequestUtility.validateUserFromToken(userRepository, response, token);
             if (user.isPresent()) {
-                userId = user.get().getId().getUserid();
+                userId = user.get().getId();
             } else {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }

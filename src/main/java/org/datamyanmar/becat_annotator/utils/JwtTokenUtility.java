@@ -12,13 +12,13 @@ import java.util.Date;
 public class JwtTokenUtility
 {
     private static final SecretKey key = Jwts.SIG.HS256.key().build();
-    public static String createJwtToken(Integer userID){
+    public static String createJwtToken(Integer value){
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
         calendar.add(Calendar.HOUR, 24);
 
         return Jwts.builder()
-                .subject(userID.toString())
+                .subject(value.toString())
                 .issuedAt(new Date())
                 .expiration(calendar.getTime())
                 .signWith(key)

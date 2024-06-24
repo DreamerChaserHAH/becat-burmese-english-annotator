@@ -46,19 +46,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+                $ref: '#/components/schemas/Message'
         '401':
           description: Invalid credentials
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+                $ref: '#/components/schemas/Message'
 
   /user/logout:
     post:
@@ -75,10 +69,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+                $ref: '#/components/schemas/Message'
   /user/history:
     get:
       operationId: getUserHistory
@@ -131,8 +122,8 @@ paths:
               schema:
                 type: object
                 properties:
-                  id:
-                    type: integer
+                  language_pair_id_jwt:
+                    type: string
                   burmese:
                     type: string
                   english:
@@ -154,7 +145,7 @@ paths:
             schema:
               type: object
               properties:
-                language_pair_id:
+                language_pair_id_jwt:
                   type: string
                 annotation:
                   $ref: '#/components/schemas/AnnotationType'
@@ -169,10 +160,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+                $ref: '#/components/schemas/Message'
 
   /global-stats:
     get:
@@ -205,6 +193,8 @@ components:
     AnnotationType:
       type: string
       enum: [UNMARKED, OKAY, MAYBE, REJECTED]
+    Message:
+      type: string
   securitySchemes:
     bearerAuth:
       type: http

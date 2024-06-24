@@ -26,18 +26,27 @@ public class WebRequestUtility
         return token;
     }
 
-    public static Optional<User> validateUserFromToken(UserRepository userRepository, HttpServletResponse response, String token){
-        Jws<Claims> claims;
+    public static Optional<Jws<Claims>> validateClaims(String token){
         try {
-            claims = JwtTokenUtility.getJwsClaims(token);
+            return Optional.of(JwtTokenUtility.getJwsClaims(token));
         }catch(SignatureException | java.security.SignatureException e){
+            return Optional.empty();
+        }
+    }
+
+    public static Optional<User> validateUserFromToken(UserRepository userRepository, HttpServletResponse response, String token){
+        Optional<Jws<Claims>> claimsOptional = validateClaims(token);
+        if(claimsOptional.isEmpty()){
             WebResponseUtility.addCookie(response, "token", "");
             return Optional.empty();
         }
+
+        Jws<Claims> claims = claimsOptional.get();
         String userValue = JwtTokenUtility.getUser(claims);
         if(userValue != null && !userValue.isEmpty() && !JwtTokenUtility.isExpired(claims)){
-            return userRepository.findByID(Integer.parseInt(userValue));
+            return userRepository.findById(Integer.parseInt(userValue));
         }
+
         WebResponseUtility.addCookie(response, "token", "");
         return Optional.empty();
     }
