@@ -31,13 +31,18 @@ import component.NumericInfoCard
 @Composable
 fun HomeScreen(){
     Box(modifier = Modifier.fillMaxSize()) {
+        Button(onClick = {}){
+            Text("Logout")
+        }
         Column(
             modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ){
             Text("Your Stats")
-            Row {
+            FlowRow(
+                horizontalArrangement = Arrangement.Center
+            ) {
                 NumericInfoCard("Total Users", "100")
                 NumericInfoCard("Total Users", "100")
                 NumericInfoCard("Total Users", "100")

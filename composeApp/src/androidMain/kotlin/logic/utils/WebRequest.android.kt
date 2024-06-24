@@ -9,7 +9,12 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-actual inline fun <reified T>sendPostRequest(url: String, postData: T) {
+actual inline fun <reified T>sendPostRequest(
+    url: String,
+    postData: T,
+    onSuccess: (String) -> Unit,
+    onForbidden: (String) -> Unit,
+    onNotFound: (String) -> Unit) {
     GlobalScope.launch {
         val client = HttpClient {
             install(JsonFeature) {
@@ -28,4 +33,12 @@ actual inline fun <reified T>sendPostRequest(url: String, postData: T) {
 
         client.close()
     }
+}
+
+actual inline fun <reified T> sendGetRequest(
+    url: String,
+    onSuccess: (String) -> Unit,
+    onForbidden: (String) -> Unit,
+    onNotFound: (String) -> Unit
+) {
 }
