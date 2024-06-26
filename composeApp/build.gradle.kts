@@ -69,6 +69,7 @@ kotlin {
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+            implementation("org.jetbrains.androidx.navigation:navigation-compose:2.7.0-alpha07")
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -116,6 +117,10 @@ android {
     dependencies {
         debugImplementation(compose.uiTooling)
     }
+}
+dependencies {
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.navigation.runtime.ktx)
 }
 
 compose.desktop {
